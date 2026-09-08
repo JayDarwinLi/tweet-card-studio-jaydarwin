@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>推文卡片生成器 | Tweet Card Studio</title>
+<meta name="description" content="把推文与文案制作成适合抖音、小红书和视频号发布的图片卡片。" />
+<link rel="icon" href="jaydarwin-avatar.jpg" />
+<link rel="stylesheet" href="styles.css?v=jaydarwin-20260908-3-bgfolder" />
+</head>
+<body>
+<main class="app-shell">
+  <nav class="topnav">
+    <a class="topnav-brand" href="#workspace"><span class="brand-dot">TC</span> Tweet Card <b>Studio</b></a>
+    <div class="topnav-meta"><span>内容</span><i></i><span>样式</span><i></i><span>导出</span></div>
+    <div class="topnav-user"><img id="brand-avatar" src="jaydarwin-avatar.jpg" alt="" /><span id="brand-eyebrow">长文JayDarwin · @JayDarwinLi</span></div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-mark" aria-hidden="true">✦</div>
+    <div class="hero-text">
+      <p class="eyebrow">SOCIAL CARD MAKER</p>
+      <h1>推文卡片生成器</h1>
+      <p>选一条内容，调好卡片和背景，直接导出适合抖音、小红书与视频号的竖图。</p>
+    </div>
+    <div class="hero-badges"><span>3:4</span><span>9:16</span><span>PNG</span><span>LIVE</span></div>
+  </header>
+
+  <div class="workspace" id="workspace">
+    <aside class="control-panel">
+
+      <section class="control-section">
+        <div class="section-heading"><span>01</span><div><h2>选择内容</h2><p>用历史推文，或直接写文案</p></div></div>
+        <div class="segmented" role="tablist">
+          <button id="tab-library" class="active">历史推文</button>
+          <button id="tab-custom">自定义文案</button>
+        </div>
+      </section>
+
+      <section class="control-section" id="library-section">
+        <div class="section-heading"><span>02</span><div><h2>素材库 <em id="lib-count"></em></h2><p>搜关键词，点一条直接上卡</p></div></div>
+        <div class="search-row">
+          <input id="search" type="search" placeholder="搜索：AI、流量、开源…" />
+          <button id="random-btn" class="icon-button" title="随机来一条">🎲</button>
+        </div>
+        <div class="chip-row" id="topic-chips"></div>
+        <div class="chip-row sort-row">
+          <span class="mini-label">排序</span>
+          <button class="chip sort-chip active" data-sort="new">最新</button>
+          <button class="chip sort-chip" data-sort="hot">最热</button>
+          <button class="chip sort-chip" data-sort="saved">最多收藏</button>
+          <select class="chip" id="month-filter"></select>
+        </div>
+        <ul class="post-list" id="post-list"></ul>
+      </section>
+
+      <section class="control-section hidden" id="custom-section">
+        <div class="section-heading"><span>02</span><div><h2>编辑文案</h2><p>从推文库带入后继续修改，也可以从头写</p></div></div>
+        <textarea id="custom-text" rows="8" placeholder="写点什么……"></textarea>
+        <button class="chip" id="custom-reseed" type="button">用推文库选中的内容替换</button>
+      </section>
+
+      <section class="control-section">
+        <div class="section-heading"><span>03</span><div><h2>账号信息</h2><p>换成你自己的身份，只保存在本机浏览器</p></div></div>
+        <div class="profile-row">
+          <img class="profile-avatar" id="profile-avatar-preview" src="jaydarwin-avatar.jpg" alt="" />
+          <label class="chip file-chip">上传头像<input id="avatar-upload" type="file" accept="image/*" hidden /></label>
+        </div>
+        <div class="option-grid">
+          <div class="option">
+            <span class="mini-label">名称</span>
+            <input class="text-input" id="profile-name" placeholder="你的名字" />
+          </div>
+          <div class="option">
+            <span class="mini-label">用户名（不带 @）</span>
+            <input class="text-input" id="profile-handle" placeholder="yourname" />
+          </div>
+          <div class="option full">
+            <span class="mini-label">认证徽章</span>
+            <div class="segmented small">
+              <button id="badge-on">蓝 V</button>
+              <button id="badge-off">无</button>
+            </div>
+          </div>
+        </div>
+        <div class="chip-row">
+          <label class="chip file-chip">导入推文库 JSON<input id="posts-upload" type="file" accept=".json,application/json" hidden /></label>
+          <button class="chip" id="posts-export" type="button">导出推文库 JSON</button>
+          <button class="chip" id="profile-reset">恢复默认</button>
+        </div>
+        <p class="mini-label">账号与导入的素材只保存在当前浏览器，不会自动上传。</p>
+      </section>
+
+      <section class="control-section">
+        <div class="section-heading"><span>04</span><div><h2>用 X API 同步推文</h2><p>用你自己的 API Key（BYOK），头像昵称自动填好</p></div></div>
+        <input class="text-input" id="x-token" type="password" placeholder="Bearer Token（AAAA 开头的长字符串）" autocomplete="off" />
+        <p class="mini-label">还没有 Key？<a href="https://developer.x.com/en/portal/dashboard" target="_blank" rel="noopener"><strong>去 X Developer Portal 创建 ↗</strong></a>　新建 App → Keys and tokens，只复制 <strong>Bearer Token</strong>；API Key / Secret 用不到。</p>
+        <div class="option-grid">
+          <div class="option">
+            <span class="mini-label">用户名（不带 @）</span>
+            <input class="text-input" id="x-handle" placeholder="yourname" />
+          </div>
+          <div class="option">
+            <span class="mini-label">拉取上限</span>
+            <select class="text-input" id="x-limit">
+              <option value="100">最近 100 条</option>
+              <option value="300" selected>最近 300 条</option>
+              <option value="500">最近 500 条</option>
+              <option value="3200">尽量全部（≤3200）</option>
+            </select>
+          </div>
+        </div>
+        <div class="chip-row">
+          <button class="chip" id="x-sync">开始同步</button>
+          <button class="chip" id="x-clear">清除 Key</button>
+          <span class="mini-label" id="x-status"></span>
+        </div>
+        <p class="mini-label">Key 只存你的浏览器本地；请求经 tools.upthos.com 无状态转发，不记录、不存储。X API 按量计费约 $0.005/条（同步 300 条 ≈ $1.5，需先在 Console 充值）；同一账号再次同步自动增量。</p>
+      </section>
+
+      <section class="control-section">
+        <div class="section-heading"><span>05</span><div><h2>交给 AI Agent</h2><p>复制当前设置，让 Codex 或 Claude Code 批量出图</p></div></div>
+        <textarea class="text-input agent-prompt" id="agent-prompt" rows="8" readonly></textarea>
+        <div class="chip-row">
+          <button class="chip" id="copy-agent">复制这段指令</button>
+          <a class="chip" href="llms.txt" target="_blank" rel="noopener">完整参数文档 ↗</a>
+        </div>
+        <p class="mini-label">指令里的链接已包含你当前调好的全部设置，改样式后重新复制即可。需要你的 Agent 有浏览器能力（浏览器 MCP / Playwright / computer-use 都行）；图片在 Agent 本机生成，不经过任何服务器。</p>
+      </section>
+
+    </aside>
+
+    <section class="preview-panel">
+      <div class="preview-topbar">
+        <span class="dot"></span><strong id="preview-label">3:4 竖图 · 1080×1440</strong>
+        <span class="drag-hint" id="drag-hint">拖动卡片调整位置 · 双击复位</span>
+        <div class="preview-actions">
+          <a id="source-link" class="ghost-btn" href="#" target="_blank" rel="noopener">查看原推</a>
+          <button id="shuffle-metrics" class="ghost-btn">换一组数据</button>
+          <button id="copy-text" class="ghost-btn">复制文案</button>
+          <button id="copy-link" class="ghost-btn" title="复制带当前设置的链接，可分享，也可交给 AI Agent 调用">复制链接</button>
+          <button id="live-btn" class="ghost-btn" title="导出 3 秒动效 MP4，手机端用 intoLive/快捷指令转成实况照片">导出 Live 图</button>
+          <button id="export-btn" class="primary-btn">下载 PNG</button>
+        </div>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="stage" id="stage">
+          <img class="stage-bg" id="stage-bg" alt="" />
+          <div class="stage-dim" id="stage-dim"></div>
+          <div class="safe-hatch" id="safe-hatch" aria-hidden="true">
+            <div class="sg-hatch sg-hatch-top"></div><div class="sg-hatch sg-hatch-bottom"></div>
+            <div class="sg-hatch sg-hatch-left"></div><div class="sg-hatch sg-hatch-right"></div>
+          </div>
+          <!-- 抖音安全区参考线：仅预览显示，导出时自动排除 -->
+          <div class="safe-guides" id="safe-guides">
+            <div class="sg-line sg-top"></div>
+            <div class="sg-line sg-right"></div>
+            <div class="sg-line sg-bottom"></div>
+            <div class="sg-line sg-left"></div>
+            <span class="sg-label sg-label-top">状态栏 / 顶部导航</span>
+            <span class="sg-label sg-label-right">互动按钮</span>
+            <span class="sg-label sg-label-bottom">文案标题 / 音乐 / 评论</span>
+          </div>
+          <!-- 9:16 下模拟抖音右侧互动栏，帮你确认卡片右边会被哪些图标压住。
+               只是预览参照，和参考线一样不会进导出成品 -->
+          <div class="tt-rail hidden" id="tt-rail">
+            <div class="ttr-avatar">
+              <img id="ttr-avatar-img" alt="" />
+              <span class="ttr-plus">+</span>
+            </div>
+            <div class="ttr-item">
+              <svg viewBox="0 0 24 24"><path d="M12 21.6l-1.5-1.35C5.4 15.63 2 12.55 2 8.78 2 5.7 4.42 3.3 7.5 3.3c1.74 0 3.41.8 4.5 2.07 1.09-1.27 2.76-2.07 4.5-2.07 3.08 0 5.5 2.4 5.5 5.48 0 3.77-3.4 6.85-8.5 11.48L12 21.6z"/></svg>
+              <b id="ttr-likes"></b>
+            </div>
+            <div class="ttr-item">
+              <svg viewBox="0 0 24 24"><path d="M12 2.4c5.52 0 10 3.62 10 8.09 0 4.47-4.48 8.09-10 8.09-.98 0-1.93-.11-2.82-.33l-4.9 2.6a.5.5 0 01-.73-.53l.78-3.86C2.9 14.98 2 13.03 2 10.49 2 6.02 6.48 2.4 12 2.4z"/></svg>
+              <b id="ttr-replies"></b>
+            </div>
+            <div class="ttr-item">
+              <svg viewBox="0 0 24 24"><path d="M5 3.6c0-.88.72-1.6 1.6-1.6h10.8c.88 0 1.6.72 1.6 1.6v18.05l-7-4.99-7 4.99V3.6z"/></svg>
+              <b id="ttr-bookmarks"></b>
+            </div>
+            <div class="ttr-item">
+              <svg viewBox="0 0 24 24"><path d="M13.2 3.4l8.4 7.5a1.2 1.2 0 010 1.8l-8.4 7.5c-.78.7-2.02.14-2.02-.9v-3.5c-4.06.12-6.9 1.28-8.68 3.52-.5.63-1.5.2-1.4-.6C1.9 12.6 5.3 8.9 11.18 8.3V4.3c0-1.04 1.24-1.6 2.02-.9z"/></svg>
+              <b id="ttr-reposts"></b>
+            </div>
+          </div>
+          <div class="tweet-card" id="tweet-card">
+            <div class="tc-head">
+              <img class="tc-avatar" id="tc-avatar" src="jaydarwin-avatar.jpg" alt="" />
+              <div class="tc-id">
+                <div class="tc-name"><span id="tc-name-text"></span>
+                  <svg class="tc-badge" id="tc-badge" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>
+                </div>
+                <div class="tc-handle"><span id="tc-handle-text"></span> · <span id="tc-date"></span></div>
+              </div>
+              <span class="tc-x-brand"><svg class="tc-x-logo" viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
+            </div>
+            <div class="tc-body" id="tc-body"></div>
+            <div class="tc-metrics" id="tc-metrics"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="control-panel control-panel-right">
+      <section class="control-section">
+        <div class="section-heading"><span>01</span><div><h2>样式</h2><p>成品形态与卡片外观</p></div></div>
+        <div class="segmented">
+          <button id="mode-poster" class="active">3:4 竖图</button>
+          <button id="mode-tall">9:16 竖图</button>
+          <button id="mode-card">纯卡片</button>
+        </div>
+        <div class="option-grid">
+          <div class="option"><span class="mini-label">卡片主题</span><div class="segmented small"><button id="theme-light" class="active">白色</button><button id="theme-dark">黑色</button></div></div>
+          <div class="option"><span class="mini-label">互动数据</span><div class="segmented small"><button id="metrics-on" class="active">显示</button><button id="metrics-off">隐藏</button></div></div>
+          <div class="option"><span class="mini-label">安全区参考线</span><div class="segmented small"><button id="guides-on" class="active">显示</button><button id="guides-off">隐藏</button></div></div>
+          <div class="option"><span class="mini-label">正文字号</span><div class="segmented small"><button id="font-auto" class="active">自动</button><button id="font-manual">手动</button></div></div>
+          <div class="option full"><label class="mini-label" for="card-width">卡片大小 <em id="width-val"></em></label><input id="card-width" type="range" min="50" max="100" value="100" /></div>
+          <div class="option full"><label class="mini-label" for="card-font">正文字号 <em id="font-val"></em></label><input id="card-font" type="range" min="20" max="48" step="1" value="34" /></div>
+          <div class="option full"><label class="mini-label" for="card-opacity">卡片透明度 <em id="opacity-val"></em></label><input id="card-opacity" type="range" min="30" max="100" value="100" /></div>
+          <div class="option full" id="dim-option"><label class="mini-label" for="bg-dim">背景压暗 <em id="dim-val">0%</em></label><input id="bg-dim" type="range" min="0" max="55" value="0" /></div>
+          <p class="option full fit-hint hidden" id="fit-hint"></p>
+        </div>
+      </section>
+
+      <section class="control-section" id="bg-section">
+        <div class="section-heading"><span>02</span><div><h2>背景</h2><p>内置图库，也可批量导入本地文件夹</p></div></div>
+        <input id="bg-search" class="bg-search" type="search" placeholder="搜背景：城市、夜景、森林……" />
+        <div class="bg-count" id="bg-count"></div>
+        <div class="bg-grid" id="bg-grid"></div>
+        <button class="ghost-btn bg-more" id="bg-more" type="button">查看更多背景</button>
+        <div class="bg-import">
+          <div class="bg-import-actions">
+            <label class="chip file-chip">上传单张<input id="bg-upload" type="file" accept="image/*" hidden /></label>
+            <label class="chip file-chip folder-chip" id="bg-folder-label">选择图片文件夹<input id="bg-folder-upload" type="file" accept="image/*" webkitdirectory directory multiple hidden /></label>
+            <button class="chip bg-folder-clear hidden" id="bg-folder-clear" type="button">清空批量背景</button>
+          </div>
+          <p class="bg-folder-status" id="bg-folder-status" role="status">文件夹图片会保存在当前浏览器，下次打开仍可使用。</p>
+          <input id="bg-url" type="url" placeholder="或粘贴图片 URL 后回车" />
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="footer">所有处理均在浏览器本地完成，文字与图片不会自动上传。</footer>
+</main>
+
+<script src="vendor/html-to-image.js"></script>
+<script src="vendor/mp4-muxer.js"></script>
+<script src="app.js?v=jaydarwin-20260908-4-bgfolder"></script>
+</body>
+</html>
