@@ -114,6 +114,15 @@ python -m http.server 8798 --bind 127.0.0.1
 
 账号设置、手动导入的推文和文件夹背景默认保存在当前浏览器。导出图片在本机生成。只有主动使用“X API 同步”或粘贴网络图片 URL 时，应用才会访问相应网络服务。
 
+## 致谢与来源
+
+本项目的代码基础与产品灵感来自以下创作者和项目：
+
+- [Ray Wang](https://github.com/imraywang) 的开源项目 [tweet-card](https://github.com/imraywang/tweet-card)，为本项目提供了代码基础。
+- [dontbesilent 抖音图文生成器](https://dontbesilent-tweet-card-studio.vercel.app/)，为本项目提供了产品与交互设计灵感。
+
+感谢两位创作者的开源贡献与公开分享。
+
 ## 开源许可
 
-本项目基于开源 Tweet Card Studio 进行二次开发，保留原项目的 `LICENSE`、作者声明和 MIT License。二次开发内容同样遵循仓库中的许可文件。
+本项目基于 Ray Wang 开源的 `tweet-card` 进行二次开发，保留原项目的 `LICENSE`、作者声明和 MIT License。二次开发内容同样遵循仓库中的许可文件。
